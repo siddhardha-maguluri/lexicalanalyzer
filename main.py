@@ -7,6 +7,7 @@ token_found = True
 lexeme = ''
 token_type = ''
 look_ahead = ''
+SYM_TAB = {}
 source_file = open('sample.scala')
 
 def printtoken(token):
@@ -16,6 +17,11 @@ def printtoken(token):
     if token:
         print ("{0:30} {1:30} {2}".format(token[1],token[0],token[2]))
 
+def BookKeeper(lexeme):
+    if lexeme in SYM_TAB.keys():
+        return True
+    else: 
+        return False
 
 def tokenerrorhandler(lexeme):
     global line_count
@@ -2998,6 +3004,11 @@ def scanner():
     global token_type
     global token_found
     token = state0()
+    if BookKeeper(lexeme):
+        pass
+    else:
+        if token_type in ['id', 'Constant']:
+            SYM_TAB[lexeme] = token_type
     lexeme = ''
     token_type = ''
     token_found = True
@@ -3015,10 +3026,12 @@ def isendofinput():
 
 def main():
     # read the file name from command line and print contents of the file to std output
+    print('--------------------- Source Program -----------------------')
     with open('sample.scala', encoding='utf-8') as source_file:
         source_code_as_string = source_file.read()
         print(source_code_as_string)
-
+    
+    print('----------------------- Lex Output ------------------------')
     print("{0:30}{1:30}{2}".format('Token','Type','Line#'))
     
     # Call scanner to find tokens
@@ -3026,8 +3039,11 @@ def main():
         token = scanner()
         if token:
             printtoken(token)
-    
-    print('All tokens are identified')
 
+    # Print the contents of the symbol table
+    print('--------------------- Symbol Table -----------------------')
+    for tokenkey, tokenvalue in SYM_TAB.items():
+        print("|{0:15}   |  {1:>15}   |".format(tokenkey, tokenvalue))
+    
 if __name__ == '__main__':
     main()
